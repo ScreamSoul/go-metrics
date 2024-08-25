@@ -4,6 +4,9 @@ import (
 	"context"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/screamsoul/go-metrics-tpl/internal/handlers"
 	"github.com/screamsoul/go-metrics-tpl/internal/middlewares"
@@ -15,8 +18,42 @@ import (
 	"go.uber.org/zap"
 )
 
+func GracefulShutdownListenAndServe(
+	ctx context.Context,
+	cancel context.CancelFunc,
+	server *http.Server,
+	logger *zap.Logger,
+) {
+
+	idleConnsClosed := make(chan struct{})
+	sigint := make(chan os.Signal, 1)
+
+	signal.Notify(sigint, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+
+	go func() {
+
+		<-sigint
+		if err := server.Shutdown(ctx); err != nil {
+			// Error close Listener
+			logger.Error("HTTP server Shutdown", zap.Error(err))
+		}
+		cancel()
+		close(idleConnsClosed)
+	}()
+
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		logger.Error("HTTP server ListenAndServe", zap.Error(err))
+	}
+
+	<-idleConnsClosed
+
+	logger.Info("Server Shutdown gracefully")
+}
+
 // Start starts the server
-func Start(ctx context.Context, cfg *Config, logger *zap.Logger) {
+func Start(cfg *Config, logger *zap.Logger) {
+	ctx, cansel := context.WithCancel(context.Background())
+	defer cansel()
 	// Create MetricStorage.
 	var mStorage repositories.MetricStorage
 
@@ -56,6 +93,7 @@ func Start(ctx context.Context, cfg *Config, logger *zap.Logger) {
 	var router = routers.NewMetricRouter(
 		metricServer,
 		middlewares.LoggingMiddleware,
+		middlewares.NewDecryptMiddleware(cfg.CryptoKey.Key),
 		middlewares.NewHashSumHeaderMiddleware(cfg.HashBodyKey),
 		middlewares.GzipDecompressMiddleware,
 		middlewares.GzipCompressMiddleware,
@@ -68,7 +106,12 @@ func Start(ctx context.Context, cfg *Config, logger *zap.Logger) {
 
 	logger.Info("starting server", zap.String("ListenAddress", cfg.ListenAddress))
 
-	if err := http.ListenAndServe(cfg.ListenAddress, router); err != nil {
-		panic(err)
-	}
+	server := http.Server{Addr: cfg.ListenAddress, Handler: router}
+
+	GracefulShutdownListenAndServe(
+		ctx,
+		cansel,
+		&server,
+		logger,
+	)
 }

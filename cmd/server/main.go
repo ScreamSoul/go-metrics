@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	"github.com/screamsoul/go-metrics-tpl/internal/server"
 	"github.com/screamsoul/go-metrics-tpl/internal/versions"
 	"github.com/screamsoul/go-metrics-tpl/pkg/logging"
@@ -10,9 +8,6 @@ import (
 
 func main() {
 	versions.PrintBuildInfo()
-
-	ctx, cansel := context.WithCancel(context.Background())
-	defer cansel()
 
 	cfg, err := server.NewConfig()
 
@@ -26,5 +21,5 @@ func main() {
 
 	logger := logging.GetLogger()
 
-	server.Start(ctx, cfg, logger)
+	server.Start(cfg, logger)
 }

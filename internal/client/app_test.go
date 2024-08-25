@@ -4,11 +4,14 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"syscall"
 	"testing"
 	"time"
 
 	"github.com/screamsoul/go-metrics-tpl/internal/models/metrics"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 )
 
 type MockMetricStorage struct {
@@ -67,7 +70,7 @@ func TestSender_SuccessfullySendsMetrics(t *testing.T) {
 
 	// Create a MetricsClient instance
 	metricClient := NewMetricsClient(
-		false, "", server.URL,
+		false, "", server.URL, nil,
 	)
 	mockMetricStorage := new(MockMetricStorage)
 
@@ -80,4 +83,15 @@ func TestSender_SuccessfullySendsMetrics(t *testing.T) {
 	go sender(ctx, mockMetricStorage, backoffIntervals, metricClient, reportInterval)
 
 	time.Sleep(2 * reportInterval)
+}
+
+func TestStartAgent(t *testing.T) {
+	cfg := &Config{}
+	logger := zap.NewNop()
+
+	time.AfterFunc(3*time.Second, func() {
+		require.NoError(t, syscall.Kill(syscall.Getpid(), syscall.SIGINT))
+	})
+
+	Start(cfg, logger)
 }

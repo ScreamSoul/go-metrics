@@ -36,3 +36,4 @@ staticlint
 /docker_data
 *.json
 .env
+*.pem

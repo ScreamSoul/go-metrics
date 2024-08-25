@@ -1,15 +1,16 @@
 package server_test
 
 import (
-	"context"
+	"syscall"
 	"testing"
+	"time"
 
 	"github.com/screamsoul/go-metrics-tpl/internal/server"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
 
 func TestStart_InitializesInMemoryStorage(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
 	cfg := &server.Config{
 		Postgres: server.Postgres{
 			DatabaseDSN: "",
@@ -23,6 +24,10 @@ func TestStart_InitializesInMemoryStorage(t *testing.T) {
 	}
 	logger := zap.NewNop()
 
-	go server.Start(ctx, cfg, logger)
-	cancel()
+	time.AfterFunc(3*time.Second, func() {
+		require.NoError(t, syscall.Kill(syscall.Getpid(), syscall.SIGINT))
+	})
+
+	server.Start(cfg, logger)
+
 }

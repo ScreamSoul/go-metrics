@@ -76,7 +76,7 @@ func Start(cfg *Config, logger *zap.Logger) {
 	pollInterval := time.Duration(cfg.PollInterval) * time.Second
 	reportInterval := time.Duration(cfg.ReportInterval) * time.Second
 
-	metricClient := NewMetricsClient(cfg.CompressRequest, cfg.HashBodyKey, cfg.GetUpdateMetricURL())
+	metricClient := NewMetricsClient(cfg.CompressRequest, cfg.HashBodyKey, cfg.GetUpdateMetricURL(), cfg.CryptoKey.Key)
 
 	go updater(ctx, metricRepo, pollInterval)
 	logger.Info("start senders", zap.Int("count_senders", cfg.RateLimit))
@@ -85,7 +85,7 @@ func Start(cfg *Config, logger *zap.Logger) {
 	}
 
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
 	go func() {
 		<-sigChan
@@ -93,5 +93,5 @@ func Start(cfg *Config, logger *zap.Logger) {
 	}()
 
 	<-ctx.Done()
-	fmt.Println("Agent closed:", ctx.Err())
+	fmt.Println("Agent gracefully closed:", ctx.Err())
 }

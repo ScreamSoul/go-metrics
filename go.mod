@@ -10,6 +10,7 @@ require (
 	github.com/gojuno/minimock/v3 v3.3.6
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kisielk/errcheck v1.7.0
 	github.com/pressly/goose/v3 v3.19.2
@@ -48,7 +49,7 @@ require (
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -28,3 +28,7 @@ logs:
 coverage:
 	go test -race -coverprofile=coverage.out -covermode=atomic ./...
 	go tool cover -html=coverage.out -o coverage.html
+
+gen-rsa:
+	openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
+	openssl rsa -pubout -in private_key.pem -out public_key.pem
