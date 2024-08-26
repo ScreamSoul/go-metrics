@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/screamsoul/go-metrics-tpl/pkg/ipmask"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -220,5 +222,63 @@ func TestNewHashSumHeaderMiddleware(t *testing.T) {
 			// Assert the expected status code
 			assert.Equal(t, tc.expectedStatus, rr.Code)
 		})
+	}
+}
+
+func TestMiddlewareAllowsRequestWithinCIDR(t *testing.T) {
+	cidrip := ipmask.CIDRIP{
+		Network: &net.IPNet{
+			IP:   net.ParseIP("192.168.1.0"),
+			Mask: net.CIDRMask(24, 32),
+		},
+	}
+	middleware := NewTrustedIpMiddleware(cidrip)
+
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.RemoteAddr = "192.168.1.10:12345"
+
+	rr := httptest.NewRecorder()
+	handler := middleware(nextHandler)
+
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+}
+
+func TestMiddlewareHandlesMalformedIP(t *testing.T) {
+	cidrip := ipmask.CIDRIP{
+		Network: &net.IPNet{
+			IP:   net.ParseIP("192.168.1.0"),
+			Mask: net.CIDRMask(24, 32),
+		},
+	}
+	middleware := NewTrustedIpMiddleware(cidrip)
+
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.RemoteAddr = "127.0.0.1"
+
+	rr := httptest.NewRecorder()
+	handler := middleware(nextHandler)
+
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusForbidden {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusForbidden)
 	}
 }

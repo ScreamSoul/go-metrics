@@ -79,8 +79,8 @@ func Start(cfg *Config, logger *zap.Logger) {
 	metricClient := NewMetricsClient(cfg.CompressRequest, cfg.HashBodyKey, cfg.GetUpdateMetricURL(), cfg.GetLocalIP(), cfg.CryptoKey.Key)
 
 	go updater(ctx, metricRepo, pollInterval)
-	logger.Info("start senders", zap.Int("count_senders", cfg.RateLimit))
-	for i := 0; i < cfg.RateLimit; i++ {
+	logger.Info("start senders", zap.Uint("count_senders", cfg.RateLimit))
+	for i := uint(0); i < cfg.RateLimit; i++ {
 		go sender(ctx, metricRepo, cfg.BackoffIntervals, metricClient, reportInterval)
 	}
 

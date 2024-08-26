@@ -93,6 +93,7 @@ func Start(cfg *Config, logger *zap.Logger) {
 	var router = routers.NewMetricRouter(
 		metricServer,
 		middlewares.LoggingMiddleware,
+		middlewares.NewTrustedIpMiddleware(cfg.TrustedSubnetCIDR),
 		middlewares.NewDecryptMiddleware(cfg.CryptoKey.Key),
 		middlewares.NewHashSumHeaderMiddleware(cfg.HashBodyKey),
 		middlewares.GzipDecompressMiddleware,

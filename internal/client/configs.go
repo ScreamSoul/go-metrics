@@ -55,7 +55,7 @@ func (cpk *CryptoPublicKey) UnmarshalText(b []byte) error {
 }
 
 type Client struct {
-	RateLimit      int    `arg:"-l,env:RATE_LIMIT" default:"1" help:"the number of simultaneous outgoing requests to the server"`
+	RateLimit      uint   `arg:"-l,env:RATE_LIMIT" default:"1" help:"the number of simultaneous outgoing requests to the server"`
 	ReportInterval int    `arg:"-r,env:REPORT_INTERVAL" default:"10" help:"the frequency of sending metrics to the server" json:"report_interval"`
 	PollInterval   int    `arg:"-p,env:POLL_INTERVAL" default:"2" help:"the frequency of polling metrics from the runtime package" json:"poll_interval"`
 	LogLevel       string `arg:"--ll,env:LOG_LEVEL" default:"INFO" help:"log level"`
@@ -84,7 +84,7 @@ func (c *Config) GetLocalIP() string {
 			logger.Warn("The local ip could not be determined", zap.Error(err))
 			return ""
 		}
-		defer conn.Close()
+		defer utils.CloseForse(conn)
 
 		localAddress := conn.LocalAddr().(*net.UDPAddr)
 
@@ -108,10 +108,6 @@ func NewConfig() (*Config, error) {
 		cfg.Server.BackoffIntervals = []time.Duration{1 * time.Second, 3 * time.Second, 5 * time.Second}
 	} else if !cfg.Server.BackoffRetries {
 		cfg.Server.BackoffIntervals = nil
-	}
-
-	if cfg.RateLimit <= 0 {
-		cfg.RateLimit = 1
 	}
 
 	return &cfg, nil
