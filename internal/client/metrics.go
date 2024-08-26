@@ -22,6 +22,7 @@ func NewMetricsClient(
 	compressRequest bool,
 	hashKey string,
 	uploadURL string,
+	localIp string,
 	pubKey *rsa.PublicKey,
 ) *MetricsClient {
 
@@ -29,6 +30,10 @@ func NewMetricsClient(
 		*resty.New(),
 		logging.GetLogger(),
 		uploadURL,
+	}
+
+	if localIp != "" {
+		client.OnBeforeRequest(middlewares.NewRealIpHeaderMiddleware(localIp))
 	}
 
 	if compressRequest {

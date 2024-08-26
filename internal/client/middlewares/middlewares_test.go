@@ -73,3 +73,15 @@ func TestNewEncryptMiddleware(t *testing.T) {
 	// Optional: Decrypt and verify the content
 	// This part requires handling the private key and might be omitted in unit tests focusing on integration
 }
+
+func TestMiddlewareSetsXRealIPHeader(t *testing.T) {
+	client := resty.New()
+	request := client.R()
+	realIp := "192.168.1.1"
+	middleware := middlewares.NewRealIpHeaderMiddleware(realIp)
+
+	err := middleware(client, request)
+
+	assert.NoError(t, err)
+	assert.Equal(t, realIp, request.Header.Get("X-Real-IP"))
+}

@@ -6,12 +6,15 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/alexflint/go-arg"
+	"github.com/screamsoul/go-metrics-tpl/pkg/logging"
 	"github.com/screamsoul/go-metrics-tpl/pkg/utils"
+	"go.uber.org/zap"
 )
 
 type CryptoPublicKey struct {
@@ -60,6 +63,7 @@ type Client struct {
 type Config struct {
 	Server
 	Client
+	localIp string
 }
 
 func (c *Config) GetServerURL() string {
@@ -69,6 +73,25 @@ func (c *Config) GetServerURL() string {
 
 func (c *Config) GetUpdateMetricURL() string {
 	return fmt.Sprintf("%s/updates/", c.GetServerURL())
+}
+
+func (c *Config) GetLocalIP() string {
+	if c.localIp == "" {
+		logger := logging.GetLogger()
+
+		conn, err := net.Dial("udp", c.Server.ListenServerHost)
+		if err != nil {
+			logger.Warn("The local ip could not be determined", zap.Error(err))
+			return ""
+		}
+		defer conn.Close()
+
+		localAddress := conn.LocalAddr().(*net.UDPAddr)
+
+		c.localIp = localAddress.IP.String()
+	}
+
+	return c.localIp
 }
 
 func NewConfig() (*Config, error) {

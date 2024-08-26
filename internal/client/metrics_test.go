@@ -22,7 +22,7 @@ func TestSendMetric_Success(t *testing.T) {
 
 	// Create a MetricsClient instance
 	client := client.NewMetricsClient(
-		false, "", server.URL, nil,
+		false, "", server.URL, "127.0.0.1", nil,
 	)
 
 	// Create a context
