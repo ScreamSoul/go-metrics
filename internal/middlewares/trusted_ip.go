@@ -23,7 +23,7 @@ func getIPAddress(r *http.Request) string {
 	return ip
 }
 
-func NewTrustedIpMiddleware(cidrip ipmask.CIDRIP) func(next http.Handler) http.Handler {
+func NewTrustedIPMiddleware(cidrip ipmask.CIDRIP) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if cidrip.Network != nil {

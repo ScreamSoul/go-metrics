@@ -63,7 +63,7 @@ type Client struct {
 type Config struct {
 	Server
 	Client
-	localIp string
+	localIP string
 }
 
 func (c *Config) GetServerURL() string {
@@ -76,7 +76,7 @@ func (c *Config) GetUpdateMetricURL() string {
 }
 
 func (c *Config) GetLocalIP() string {
-	if c.localIp == "" {
+	if c.localIP == "" {
 		logger := logging.GetLogger()
 
 		conn, err := net.Dial("udp", c.Server.ListenServerHost)
@@ -88,10 +88,10 @@ func (c *Config) GetLocalIP() string {
 
 		localAddress := conn.LocalAddr().(*net.UDPAddr)
 
-		c.localIp = localAddress.IP.String()
+		c.localIP = localAddress.IP.String()
 	}
 
-	return c.localIp
+	return c.localIP
 }
 
 func NewConfig() (*Config, error) {

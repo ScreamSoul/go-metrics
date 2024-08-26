@@ -232,7 +232,7 @@ func TestMiddlewareAllowsRequestWithinCIDR(t *testing.T) {
 			Mask: net.CIDRMask(24, 32),
 		},
 	}
-	middleware := NewTrustedIpMiddleware(cidrip)
+	middleware := NewTrustedIPMiddleware(cidrip)
 
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -261,7 +261,7 @@ func TestMiddlewareHandlesMalformedIP(t *testing.T) {
 			Mask: net.CIDRMask(24, 32),
 		},
 	}
-	middleware := NewTrustedIpMiddleware(cidrip)
+	middleware := NewTrustedIPMiddleware(cidrip)
 
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

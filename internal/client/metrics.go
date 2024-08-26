@@ -22,7 +22,7 @@ func NewMetricsClient(
 	compressRequest bool,
 	hashKey string,
 	uploadURL string,
-	localIp string,
+	localIP string,
 	pubKey *rsa.PublicKey,
 ) *MetricsClient {
 
@@ -32,8 +32,8 @@ func NewMetricsClient(
 		uploadURL,
 	}
 
-	if localIp != "" {
-		client.OnBeforeRequest(middlewares.NewRealIpHeaderMiddleware(localIp))
+	if localIP != "" {
+		client.OnBeforeRequest(middlewares.NewRealIPHeaderMiddleware(localIP))
 	}
 
 	if compressRequest {

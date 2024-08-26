@@ -77,11 +77,11 @@ func TestNewEncryptMiddleware(t *testing.T) {
 func TestMiddlewareSetsXRealIPHeader(t *testing.T) {
 	client := resty.New()
 	request := client.R()
-	realIp := "192.168.1.1"
-	middleware := middlewares.NewRealIpHeaderMiddleware(realIp)
+	realIP := "192.168.1.1"
+	middleware := middlewares.NewRealIPHeaderMiddleware(realIP)
 
 	err := middleware(client, request)
 
 	assert.NoError(t, err)
-	assert.Equal(t, realIp, request.Header.Get("X-Real-IP"))
+	assert.Equal(t, realIP, request.Header.Get("X-Real-IP"))
 }
