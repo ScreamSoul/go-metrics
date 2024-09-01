@@ -11,9 +11,9 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/gojuno/minimock/v3"
-	"github.com/screamsoul/go-metrics-tpl/internal/handlers"
 	"github.com/screamsoul/go-metrics-tpl/internal/models/metrics"
-	"github.com/screamsoul/go-metrics-tpl/internal/routers"
+	"github.com/screamsoul/go-metrics-tpl/internal/restapi/handlers"
+	"github.com/screamsoul/go-metrics-tpl/internal/restapi/routers"
 	"github.com/stretchr/testify/suite"
 )
 

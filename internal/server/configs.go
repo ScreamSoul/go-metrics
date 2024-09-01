@@ -28,6 +28,7 @@ type CryptoPublicKey struct {
 type Config struct {
 	Postgres
 	ListenAddress     string          `arg:"-a,env:ADDRESS" default:"localhost:8080" help:"Адрес и порт сервера" json:"address"`
+	ListenGRPCAddress string          `arg:"--grpc,env:GRPC_ADDRESS" default:"localhost:50051" help:"Адрес и порт сервера GRPC" json:"grpc_address"`
 	LogLevel          string          `arg:"--ll,env:LOG_LEVEL" default:"INFO" help:"Уровень логирования"`
 	StoreInterval     int             `arg:"-i,env:STORE_INTERVAL" default:"300" help:"Интервал времени в секундах, по истечении которого текущие показания сервера сохраняются на диск" json:"store_interval"`
 	FileStoragePath   string          `arg:"-f,env:FILE_STORAGE_PATH" default:"/tmp/metrics-db.json" help:"Полное имя файла, куда сохраняются текущие значения" json:"store_file"`
@@ -39,6 +40,10 @@ type Config struct {
 }
 
 func (cpk *CryptoPublicKey) UnmarshalText(b []byte) error {
+	if len(b) == 0 {
+		return nil
+	}
+
 	keyData, err := os.ReadFile(string(b))
 	if err != nil {
 		return err

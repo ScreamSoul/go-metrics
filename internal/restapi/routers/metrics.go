@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/screamsoul/go-metrics-tpl/internal/handlers"
+	"github.com/screamsoul/go-metrics-tpl/internal/restapi/handlers"
 )
 
 func NewMetricRouter(

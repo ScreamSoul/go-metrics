@@ -31,6 +31,10 @@ type Server struct {
 }
 
 func (cpk *CryptoPublicKey) UnmarshalText(b []byte) error {
+	if len(b) == 0 {
+		return nil
+	}
+
 	keyData, err := os.ReadFile(string(b))
 	if err != nil {
 		return err
