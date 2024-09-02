@@ -63,6 +63,7 @@ type Client struct {
 	ReportInterval int    `arg:"-r,env:REPORT_INTERVAL" default:"10" help:"the frequency of sending metrics to the server" json:"report_interval"`
 	PollInterval   int    `arg:"-p,env:POLL_INTERVAL" default:"2" help:"the frequency of polling metrics from the runtime package" json:"poll_interval"`
 	LogLevel       string `arg:"--ll,env:LOG_LEVEL" default:"INFO" help:"log level"`
+	GRPCClient     bool   `arg:"--grpc,env:GRPC_CLIENT" default:"false" help:"If the flag is set, the client uses grpc"`
 }
 type Config struct {
 	Server

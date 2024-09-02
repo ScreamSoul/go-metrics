@@ -1,5 +1,5 @@
 // correctly compresses a valid byte slice body
-package client_test
+package restymetric_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/screamsoul/go-metrics-tpl/internal/client"
+	"github.com/screamsoul/go-metrics-tpl/internal/client/restymetric"
 	"github.com/screamsoul/go-metrics-tpl/internal/models/metrics"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestSendMetric_Success(t *testing.T) {
 	defer server.Close()
 
 	// Create a MetricsClient instance
-	client := client.NewMetricsClient(
+	client := restymetric.NewRestyMetricsClient(
 		false, "", server.URL, "127.0.0.1", nil,
 	)
 

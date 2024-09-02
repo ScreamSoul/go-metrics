@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/screamsoul/go-metrics-tpl/internal/client/restymetric"
+
 	"github.com/screamsoul/go-metrics-tpl/internal/models/metrics"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -69,7 +71,7 @@ func TestSender_SuccessfullySendsMetrics(t *testing.T) {
 	defer server.Close()
 
 	// Create a MetricsClient instance
-	metricClient := NewMetricsClient(
+	metricClient := restymetric.NewRestyMetricsClient(
 		false, "", server.URL, "127.0.0.1", nil,
 	)
 	mockMetricStorage := new(MockMetricStorage)
