@@ -7,6 +7,7 @@ toolchain go1.22.6
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/alexflint/go-arg v1.5.1
+	github.com/fergusstrange/embedded-postgres v1.29.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-resty/resty/v2 v2.14.0
 	github.com/gojuno/minimock/v3 v3.4.0
@@ -32,6 +33,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -42,6 +44,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
+	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect

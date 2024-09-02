@@ -54,7 +54,7 @@ func NewRestyMetricsClient(
 func (client *RestyMetricsClient) SendMetric(ctx context.Context, metricsList []metrics.Metrics) error {
 	jsonData, err := json.Marshal(metricsList)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	resp, err := resty.New().R().

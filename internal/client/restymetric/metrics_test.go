@@ -3,6 +3,7 @@ package restymetric_test
 
 import (
 	"context"
+	"crypto/rsa"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,6 +12,17 @@ import (
 	"github.com/screamsoul/go-metrics-tpl/internal/models/metrics"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestNewRestyMetricsClient(t *testing.T) {
+	hashKey := "secretKey"
+	uploadURL := "https://example.com/upload"
+	localIP := "192.168.1.1"
+	pubKey := &rsa.PublicKey{}
+
+	client := restymetric.NewRestyMetricsClient(true, hashKey, uploadURL, localIP, pubKey)
+
+	assert.NotNil(t, client, "Client should not be nil")
+}
 
 // Successfully sends a list of metrics to the specified upload URL
 func TestSendMetric_Success(t *testing.T) {
@@ -39,4 +51,24 @@ func TestSendMetric_Success(t *testing.T) {
 
 	// Assert no error occurred
 	assert.NoError(t, err)
+}
+
+// Handles JSON marshalling errors gracefully
+func TestSendMetricFail(t *testing.T) {
+	// Create a MetricsClient instance
+	client := restymetric.NewRestyMetricsClient(
+		false, "", "fakeurl", "127.0.0.1", nil,
+	)
+
+	// Create a sample metrics list
+	metricsList := []metrics.Metrics{
+		{ID: "metric1", MType: "gauge", Value: new(float64)},
+		{ID: "metric2", MType: "counter", Delta: new(int64)},
+	}
+
+	err := client.SendMetric(context.Background(), metricsList)
+
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
 }
