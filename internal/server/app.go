@@ -13,6 +13,7 @@ import (
 
 	pb "github.com/screamsoul/go-metrics-tpl/internal/proto"
 
+	"github.com/screamsoul/go-metrics-tpl/internal/grpcapi/interceptors"
 	"github.com/screamsoul/go-metrics-tpl/internal/grpcapi/services"
 	"github.com/screamsoul/go-metrics-tpl/internal/repositories"
 	"github.com/screamsoul/go-metrics-tpl/internal/repositories/file"
@@ -102,7 +103,7 @@ func StartGRPCServer(
 		return
 	}
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptors.NewTrustedIPMiddleware(cfg.TrustedSubnetCIDR)))
 
 	idleConnsClosed := make(chan any)
 	sigint := make(chan os.Signal, 1)
