@@ -29,7 +29,7 @@ import (
 var ErrRegularShutdown = errors.New("regular shutdown")
 var ErrUnexpectedShutdown = errors.New("unexpected shutdown")
 
-func StartHttpServer(
+func StartHTTPServer(
 	ctx context.Context,
 	errorResult chan error,
 	cfg *Config,
@@ -175,7 +175,7 @@ func Start(cfg *Config, logger *zap.Logger) {
 
 	errorResult := make(chan error)
 
-	go StartHttpServer(ctx, errorResult, cfg, logger, mStorageRestore)
+	go StartHTTPServer(ctx, errorResult, cfg, logger, mStorageRestore)
 	go StartGRPCServer(ctx, errorResult, cfg, logger, mStorageRestore)
 
 	if err := <-errorResult; err != nil {

@@ -49,7 +49,7 @@ func (s *MetricServer) UpdateMetrics(ctx context.Context, in *pb.MetricsRequest)
 				"",
 			)
 			if err != nil {
-				return nil, status.Errorf(codes.DataLoss, err.Error())
+				return nil, status.Error(codes.DataLoss, err.Error())
 			}
 
 			metric.Value = &m.Value
@@ -57,7 +57,7 @@ func (s *MetricServer) UpdateMetrics(ctx context.Context, in *pb.MetricsRequest)
 
 			err = metric.ValidateValue()
 			if err != nil {
-				return nil, status.Errorf(codes.DataLoss, err.Error())
+				return nil, status.Error(codes.DataLoss, err.Error())
 			}
 
 			metricChunk = append(metricChunk, *metric)
@@ -66,7 +66,7 @@ func (s *MetricServer) UpdateMetrics(ctx context.Context, in *pb.MetricsRequest)
 		err := s.store.BulkAdd(ctx, metricChunk)
 		if err != nil {
 			s.logger.Error("internal error", zap.Error(err))
-			return nil, status.Errorf(codes.Internal, `internal error`)
+			return nil, status.Error(codes.Internal, "internal error")
 		}
 
 	}
