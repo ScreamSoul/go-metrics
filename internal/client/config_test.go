@@ -226,3 +226,29 @@ func TestConfigFile(t *testing.T) {
 	assert.Equal(t, "localhost:1234", cfg.Server.ListenServerHost)
 
 }
+
+func TestRetrieveLocalIPWhenNotSet(t *testing.T) {
+	c := &client.Config{
+		Server: client.Server{
+			ListenServerHost: "8.8.8.8:80",
+		},
+	}
+
+	ip := c.GetLocalIP()
+
+	if ip == "" {
+		t.Errorf("Expected a non-empty IP address, got %s", ip)
+	}
+}
+
+func TestGetLocalIPInvalidDomainAdderss(t *testing.T) {
+	c := &client.Config{
+		Server: client.Server{
+			ListenServerHost: "fail_domain:8000",
+		},
+	}
+
+	ip := c.GetLocalIP()
+
+	assert.Equal(t, ip, "")
+}

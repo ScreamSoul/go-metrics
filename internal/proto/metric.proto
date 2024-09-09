@@ -1,0 +1,29 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package metrics.proto;
+
+
+option go_package = "github.com/screamsoul/go-metrics-tpl/proto";
+
+service MetricsService {
+    // Bulk update metrics
+    rpc UpdateMetrics(MetricsRequest) returns (google.protobuf.Empty);
+}
+
+message Metric {
+    string name = 1; // Имя метрики
+    enum MType {
+        GAUGE = 0;
+        COUNTER = 1;
+    }
+    MType m_type = 2; // Тип метрики
+    int64  delta = 3; // Значение метрики в случае передачи counter
+    double value = 4; // значение метрики в случае передачи gauge
+
+}
+
+message MetricsRequest {
+    repeated Metric metrics = 1;
+}
+
+

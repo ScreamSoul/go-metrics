@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/screamsoul/go-metrics-tpl/internal/handlers"
 	"github.com/screamsoul/go-metrics-tpl/internal/repositories/memory"
+	"github.com/screamsoul/go-metrics-tpl/internal/restapi/handlers"
 )
 
 // MyResponseWriter implements http.ResponseWriter

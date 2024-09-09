@@ -46,18 +46,19 @@ func (conf StaticcheckConfig) GetAnalizers() (analizers []*analysis.Analyzer) {
 	return
 }
 
+func getCheckers() (checks []*analysis.Analyzer) {
+	checks = append(checks, printf.Analyzer)
+	checks = append(checks, shadow.Analyzer)
+	checks = append(checks, structtag.Analyzer)
+	checks = append(checks, errcheck.Analyzer)
+	checks = append(checks, exitinmain.ExitInMainCheckAnalyzer)
+
+	checks = append(checks, NewStaticcheckConfig().GetAnalizers()...)
+	return
+}
+
 func main() {
-	var mychecks []*analysis.Analyzer
-
-	mychecks = append(mychecks, printf.Analyzer)
-	mychecks = append(mychecks, shadow.Analyzer)
-	mychecks = append(mychecks, structtag.Analyzer)
-	mychecks = append(mychecks, errcheck.Analyzer)
-	mychecks = append(mychecks, exitinmain.ExitInMainCheckAnalyzer)
-
-	mychecks = append(mychecks, NewStaticcheckConfig().GetAnalizers()...)
-
 	multichecker.Main(
-		mychecks...,
+		getCheckers()...,
 	)
 }

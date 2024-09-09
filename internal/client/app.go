@@ -8,18 +8,23 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/screamsoul/go-metrics-tpl/internal/client/grpcmetric"
+	"github.com/screamsoul/go-metrics-tpl/internal/client/restymetric"
 	"github.com/screamsoul/go-metrics-tpl/internal/repositories"
 	"github.com/screamsoul/go-metrics-tpl/internal/repositories/memory"
 	"github.com/screamsoul/go-metrics-tpl/pkg/backoff"
 	"github.com/screamsoul/go-metrics-tpl/pkg/logging"
+	"github.com/screamsoul/go-metrics-tpl/pkg/utils"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func sender(
 	ctx context.Context,
 	metricRepo repositories.CollectionMetric,
 	backoffIntervals []time.Duration,
-	metricClient *MetricsClient,
+	metricClient MetricsClient,
 	reportInterval time.Duration,
 ) {
 	logger := logging.GetLogger()
@@ -76,14 +81,26 @@ func Start(cfg *Config, logger *zap.Logger) {
 	pollInterval := time.Duration(cfg.PollInterval) * time.Second
 	reportInterval := time.Duration(cfg.ReportInterval) * time.Second
 
-	metricClient := NewMetricsClient(cfg.CompressRequest, cfg.HashBodyKey, cfg.GetUpdateMetricURL(), cfg.CryptoKey.Key)
+	var metricClient MetricsClient
+
+	if cfg.GRPCClient {
+		conn, err := grpc.NewClient(cfg.ListenServerHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			logger.Fatal("connect to grpc server fail", zap.Error(err))
+		}
+		defer utils.CloseForse(conn)
+		metricClient = grpcmetric.NewGRPCMetricsClient(conn)
+	} else {
+		metricClient = restymetric.NewRestyMetricsClient(cfg.CompressRequest, cfg.HashBodyKey, cfg.GetUpdateMetricURL(), cfg.GetLocalIP(), cfg.CryptoKey.Key)
+	}
 
 	go updater(ctx, metricRepo, pollInterval)
-	logger.Info("start senders", zap.Int("count_senders", cfg.RateLimit))
-	for i := 0; i < cfg.RateLimit; i++ {
+	logger.Info("start senders", zap.Uint("count_senders", cfg.RateLimit))
+	for i := uint(0); i < cfg.RateLimit; i++ {
 		go sender(ctx, metricRepo, cfg.BackoffIntervals, metricClient, reportInterval)
 	}
 
+	// gracefull close
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
